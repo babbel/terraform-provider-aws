@@ -5,6 +5,7 @@ services:
 language: go
 go:
 - 1.9.1
+go_import_path: github.com/terraform-providers/terraform-provider-aws
 
 install:
 # This script is used by the Travis build to install a cookie for
@@ -20,9 +21,6 @@ script:
 - make vet
 - make website-test
 
-branches:
-  only:
-  - master
 matrix:
   fast_finish: true
   allow_failures:
