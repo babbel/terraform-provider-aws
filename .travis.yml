@@ -5,6 +5,7 @@ services:
 language: go
 go:
 - "1.11.1"
+go_import_path: github.com/terraform-providers/terraform-provider-aws
 
 git:
   depth: 1
@@ -24,9 +25,6 @@ script:
 - make website-lint
 - make website-test
 
-branches:
-  only:
-  - master
 matrix:
   fast_finish: true
   allow_failures:
