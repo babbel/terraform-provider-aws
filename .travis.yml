@@ -3,6 +3,7 @@ sudo: false
 language: go
 go:
 - 1.8.1
+go_import_path: github.com/terraform-providers/terraform-provider-aws
 
 install:
 # This script is used by the Travis build to install a cookie for
@@ -17,9 +18,6 @@ script:
 - make vendor-status
 - make vet
 
-branches:
-  only:
-  - master
 matrix:
   fast_finish: true
   allow_failures:
