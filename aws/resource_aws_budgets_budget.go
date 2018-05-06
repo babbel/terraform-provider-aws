@@ -343,6 +343,10 @@ func resourceAwsBudgetsBudgetNotificationRead(d *schema.ResourceData, meta inter
 
 	accountID, budgetName, err := decodeBudgetsBudgetID(d.Id())
 
+	if err != nil {
+		return fmt.Errorf("Decoding budget ID failed: %v", err)
+	}
+
 	describeNotificationsForBudgetOutput, err := client.DescribeNotificationsForBudget(&budgets.DescribeNotificationsForBudgetInput{
 		BudgetName: aws.String(budgetName),
 		AccountId:  aws.String(accountID),
@@ -451,11 +455,15 @@ func resourceAwsBudgetsBudgetNotificationsUpdate(d *schema.ResourceData, meta in
 		addNotifications, addSubscribers := expandBudgetNotificationsUnmarshal(ns.Difference(os).List())
 
 		for _, notification := range removeNotifications {
-			client.DeleteNotification(&budgets.DeleteNotificationInput{
+			_, err := client.DeleteNotification(&budgets.DeleteNotificationInput{
 				Notification: notification,
 				BudgetName:   aws.String(budgetName),
 				AccountId:    aws.String(accountID),
 			})
+
+			if err != nil {
+				return fmt.Errorf("Deleting budget notification failed: %v", err)
+			}
 		}
 
 		err = resourceAwsBudgetsBudgetNotificationsCreate(addNotifications, addSubscribers, budgetName, accountID, meta)
