@@ -7,9 +7,6 @@ go:
 - 1.9.1
 go_import_path: github.com/terraform-providers/terraform-provider-aws
 
-git:
-  depth: 1
-
 install:
 # This script is used by the Travis build to install a cookie for
 # go.googlesource.com so rate limits are higher when using `go get` to fetch
