@@ -306,8 +306,7 @@ resource "aws_cloudfront_distribution" "example" {
   Valid values: `viewer-request`, `origin-request`, `viewer-response`,
   `origin-response`
 * `lambda_arn` (Required) - ARN of the Lambda function.
-* `include_body` (Optional) - When specified it includes the body of the request whithin the lambda function. Defaults to false.
-  Valid Values: `true`, `false`.
+* `include_body` (Optional) - When specified it includes the body of the request whithin the lambda function. Defaults to false. Valid values: `true`, `false`.
 
 ##### Cookies Arguments
 
