@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -215,6 +216,7 @@ func resourceAwsAcmCertificateRead(d *schema.ResourceData, meta interface{}) err
 		}
 
 		domainValidationOptions, emailValidationOptions, err := convertValidationOptions(resp.Certificate)
+		sortDomainValidationOptions(resp.Certificate.DomainName, domainValidationOptions)
 
 		if err != nil {
 			return resource.RetryableError(err)
@@ -313,6 +315,27 @@ func convertValidationOptions(certificate *acm.CertificateDetail) ([]map[string]
 	}
 
 	return domainValidationResult, emailValidationResult, nil
+}
+
+// sortDomainValidationOptions sorts a slice of domain validation options as follows:
+// the option corresponding to the certficate's domain name is first;
+// the remaining options are sorted alphabetically by their domain name.
+// Sorting is necessary because the API endpoint returns the validation options in random
+// order different each time.
+func sortDomainValidationOptions(domainName *string, domainValiationOptions []map[string]interface{}) {
+	sort.Slice(domainValiationOptions, func(i, j int) bool {
+		return domainValiationOptions[i]["domain_name"].(string) <
+			domainValiationOptions[j]["domain_name"].(string)
+	})
+
+	for i, option := range domainValiationOptions {
+		if option["domain_name"] == domainName {
+			swap := domainValiationOptions[0]
+			domainValiationOptions[0] = domainValiationOptions[i]
+			domainValiationOptions[i] = swap
+			break
+		}
+	}
 }
 
 func resourceAwsAcmCertificateDelete(d *schema.ResourceData, meta interface{}) error {
