@@ -324,18 +324,16 @@ func convertValidationOptions(certificate *acm.CertificateDetail) ([]map[string]
 // order different each time.
 func sortDomainValidationOptions(domainName *string, domainValiationOptions []map[string]interface{}) {
 	sort.Slice(domainValiationOptions, func(i, j int) bool {
+		if domainValiationOptions[i]["domain_name"].(string) == *domainName {
+			return true
+		}
+		if domainValiationOptions[j]["domain_name"].(string) == *domainName {
+			return false
+		}
+
 		return domainValiationOptions[i]["domain_name"].(string) <
 			domainValiationOptions[j]["domain_name"].(string)
 	})
-
-	for i, option := range domainValiationOptions {
-		if option["domain_name"] == domainName {
-			swap := domainValiationOptions[0]
-			domainValiationOptions[0] = domainValiationOptions[i]
-			domainValiationOptions[i] = swap
-			break
-		}
-	}
 }
 
 func resourceAwsAcmCertificateDelete(d *schema.ResourceData, meta interface{}) error {
