@@ -6,7 +6,6 @@ language: go
 go:
   - "1.12.x"
 env:
-env:
   global:
     - GOFLAGS=-mod=vendor
     - LINUX_BINARY_PATH=${GOPATH}/bin/terraform-provider-aws
