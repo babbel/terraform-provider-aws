@@ -148,14 +148,20 @@ func resourceAwsOpsworksSetPermission(d *schema.ResourceData, meta interface{}) 
 	}
 
 	err := resource.Retry(2*time.Minute, func() *resource.RetryError {
-		var cerr error
-		_, cerr = client.SetPermission(req)
-		if cerr != nil {
-			log.Printf("[INFO] client error")
-			return resource.NonRetryableError(cerr)
+		_, err := client.SetPermission(req)
+		if err != nil {
+
+			if isAWSErr(err, opsworks.ErrCodeResourceNotFoundException, "Unable to find user with ARN") {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
 		}
 		return nil
 	})
+
+	if isResourceTimeoutError(err) {
+		_, err = client.SetPermission(req)
+	}
 
 	if err != nil {
 		return err
