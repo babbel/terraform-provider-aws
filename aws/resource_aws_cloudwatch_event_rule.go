@@ -44,6 +44,12 @@ func resourceAwsCloudWatchEventRule() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(0, 256),
 			},
+			"event_bus_name": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateCloudWatchEventBusName,
+			},
 			"event_pattern": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -135,6 +141,9 @@ func resourceAwsCloudWatchEventRuleRead(d *schema.ResourceData, meta interface{}
 	input := events.DescribeRuleInput{
 		Name: aws.String(d.Id()),
 	}
+	if v, ok := d.GetOk("event_bus_name"); ok {
+		input.EventBusName = aws.String(v.(string))
+	}
 	log.Printf("[DEBUG] Reading CloudWatch Event Rule: %s", input)
 	out, err := conn.DescribeRule(&input)
 	if awsErr, ok := err.(awserr.Error); ok {
@@ -151,6 +160,7 @@ func resourceAwsCloudWatchEventRuleRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("arn", out.Arn)
 	d.Set("description", out.Description)
+	d.Set("event_bus_name", out.EventBusName)
 	if out.EventPattern != nil {
 		pattern, err := structure.NormalizeJsonString(*out.EventPattern)
 		if err != nil {
@@ -239,9 +249,13 @@ func resourceAwsCloudWatchEventRuleDelete(d *schema.ResourceData, meta interface
 	conn := meta.(*AWSClient).cloudwatcheventsconn
 
 	log.Printf("[INFO] Deleting CloudWatch Event Rule: %s", d.Id())
-	_, err := conn.DeleteRule(&events.DeleteRuleInput{
+	input := events.DeleteRuleInput{
 		Name: aws.String(d.Id()),
-	})
+	}
+	if v, ok := d.GetOk("event_bus_name"); ok {
+		input.EventBusName = aws.String(v.(string))
+	}
+	_, err := conn.DeleteRule(&input)
 	if err != nil {
 		return fmt.Errorf("Error deleting CloudWatch Event Rule: %s", err)
 	}
@@ -256,6 +270,9 @@ func buildPutRuleInputStruct(d *schema.ResourceData, name string) (*events.PutRu
 	}
 	if v, ok := d.GetOk("description"); ok {
 		input.Description = aws.String(v.(string))
+	}
+	if v, ok := d.GetOk("event_bus_name"); ok {
+		input.EventBusName = aws.String(v.(string))
 	}
 	if v, ok := d.GetOk("event_pattern"); ok {
 		pattern, err := structure.NormalizeJsonString(v)

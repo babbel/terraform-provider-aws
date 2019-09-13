@@ -28,6 +28,13 @@ func resourceAwsCloudWatchEventTarget() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			"event_bus_name": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateCloudWatchEventBusName,
+			},
+
 			"rule": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -267,6 +274,7 @@ func resourceAwsCloudWatchEventTargetRead(d *schema.ResourceData, meta interface
 
 	t, err := findEventTargetById(
 		d.Get("target_id").(string),
+		d.Get("event_bus_name").(string),
 		d.Get("rule").(string),
 		nil, conn)
 	if err != nil {
@@ -340,11 +348,14 @@ func resourceAwsCloudWatchEventTargetRead(d *schema.ResourceData, meta interface
 	return nil
 }
 
-func findEventTargetById(id, rule string, nextToken *string, conn *events.CloudWatchEvents) (*events.Target, error) {
+func findEventTargetById(id, eventBus string, rule string, nextToken *string, conn *events.CloudWatchEvents) (*events.Target, error) {
 	input := events.ListTargetsByRuleInput{
 		Rule:      aws.String(rule),
 		NextToken: nextToken,
 		Limit:     aws.Int64(100), // Set limit to allowed maximum to prevent API throttling
+	}
+	if len(eventBus) > 0 {
+		input.EventBusName = aws.String(eventBus)
 	}
 	log.Printf("[DEBUG] Reading CloudWatch Event Target: %s", input)
 	out, err := conn.ListTargetsByRule(&input)
@@ -359,7 +370,7 @@ func findEventTargetById(id, rule string, nextToken *string, conn *events.CloudW
 	}
 
 	if out.NextToken != nil {
-		return findEventTargetById(id, rule, nextToken, conn)
+		return findEventTargetById(id, eventBus, rule, nextToken, conn)
 	}
 
 	return nil, fmt.Errorf("CloudWatch Event Target %q (%q) not found", id, rule)
@@ -386,6 +397,10 @@ func resourceAwsCloudWatchEventTargetDelete(d *schema.ResourceData, meta interfa
 		Ids:  []*string{aws.String(d.Get("target_id").(string))},
 		Rule: aws.String(d.Get("rule").(string)),
 	}
+	if v, ok := d.GetOk("event_bus_name"); ok {
+		input.EventBusName = aws.String(v.(string))
+	}
+
 	log.Printf("[INFO] Deleting CloudWatch Event Target: %s", input)
 	_, err := conn.RemoveTargets(&input)
 	if err != nil {
@@ -438,6 +453,10 @@ func buildPutTargetInputStruct(d *schema.ResourceData) *events.PutTargetsInput {
 	input := events.PutTargetsInput{
 		Rule:    aws.String(d.Get("rule").(string)),
 		Targets: []*events.Target{e},
+	}
+
+	if v, ok := d.GetOk("event_bus_name"); ok {
+		input.EventBusName = aws.String(v.(string))
 	}
 
 	return &input
