@@ -20,7 +20,7 @@ resource "aws_cloudwatch_event_bus" "messenger" {
 resource "aws_cloudwatch_event_rule" "foo" {
   name           = "foo"
   event_bus_name = aws_cloudwatch_event_bus.messenger.name
-  event_pattern = <<PATTERN
+  event_pattern  = <<PATTERN
 {
   "detail-type": [
     "foo"
