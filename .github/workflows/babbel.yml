@@ -51,7 +51,6 @@ jobs:
     - name: sanity-check
       run: |
         golangci-lint --version
-        golangci-lint run ./$(PKG_NAME)/...
         make lint
 
   # See https://github.com/actions/upload-release-asset
