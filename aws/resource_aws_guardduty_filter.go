@@ -183,7 +183,10 @@ func resourceAwsGuardDutyFilterRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("name", filter.Name)
 	d.Set("detector_id", detectorId)
 	d.Set("rank", filter.Rank)
+
+	//lintignore:AWSR002
 	d.Set("tags", filter.Tags)
+
 	d.SetId(strings.Join([]string{detectorId, name}, "_"))
 
 	return nil
