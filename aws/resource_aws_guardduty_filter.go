@@ -253,14 +253,14 @@ func criteriaFields() []string {
 
 func criteriaMap() map[string][]string {
 	return map[string][]string{
-		"confidence": {"equals", "not_equals"},
-		"id":         {"equals", "not_equals"},
-		"account_id": {"equals", "not_equals"},
-		"region":     {"equals", "not_equals"},
-		"resource.accessKeyDetails.accessKeyId":                                          {"equals", "not_equals"},
-		"resource.accessKeyDetails.principalId":                                          {"equals", "not_equals"},
-		"resource.accessKeyDetails.userName":                                             {"equals", "not_equals"},
-		"resource.accessKeyDetails.userType":                                             {"equals", "not_equals"},
+		"confidence":                            {"equals", "not_equals"},
+		"id":                                    {"equals", "not_equals"},
+		"account_id":                            {"equals", "not_equals"},
+		"region":                                {"equals", "not_equals"},
+		"resource.accessKeyDetails.accessKeyId": {"equals", "not_equals"},
+		"resource.accessKeyDetails.principalId": {"equals", "not_equals"},
+		"resource.accessKeyDetails.userName":    {"equals", "not_equals"},
+		"resource.accessKeyDetails.userType":    {"equals", "not_equals"},
 		"resource.instanceDetails.iamInstanceProfile.id":                                 {"equals", "not_equals"},
 		"resource.instanceDetails.imageId":                                               {"equals", "not_equals"},
 		"resource.instanceDetails.instanceId":                                            {"equals", "not_equals"},
