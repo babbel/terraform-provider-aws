@@ -155,6 +155,7 @@ func resourceAwsGuardDutyFilterRead(d *schema.ResourceData, meta interface{}) er
 	}
 
 	conn := meta.(*AWSClient).guarddutyconn
+	ignoreTagsConfig := meta.(*AWSClient).IgnoreTagsConfig
 
 	input := guardduty.GetFilterInput{
 		DetectorId: aws.String(detectorId),
@@ -183,7 +184,8 @@ func resourceAwsGuardDutyFilterRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("name", filter.Name)
 	d.Set("detector_id", detectorId)
 	d.Set("rank", filter.Rank)
-	d.Set("tags", filter.Tags)
+	d.Set("tags", filter.Tags.IgnoreAws().IgnoreConfig(ignoreTagsConfig).Map())
+
 	d.SetId(strings.Join([]string{detectorId, name}, "_"))
 
 	return nil
@@ -250,14 +252,14 @@ func criteriaFields() []string {
 
 func criteriaMap() map[string][]string {
 	return map[string][]string{
-		"confidence":                            {"equals", "not_equals"},
-		"id":                                    {"equals", "not_equals"},
-		"account_id":                            {"equals", "not_equals"},
-		"region":                                {"equals", "not_equals"},
-		"resource.accessKeyDetails.accessKeyId": {"equals", "not_equals"},
-		"resource.accessKeyDetails.principalId": {"equals", "not_equals"},
-		"resource.accessKeyDetails.userName":    {"equals", "not_equals"},
-		"resource.accessKeyDetails.userType":    {"equals", "not_equals"},
+		"confidence": {"equals", "not_equals"},
+		"id":         {"equals", "not_equals"},
+		"account_id": {"equals", "not_equals"},
+		"region":     {"equals", "not_equals"},
+		"resource.accessKeyDetails.accessKeyId":                                          {"equals", "not_equals"},
+		"resource.accessKeyDetails.principalId":                                          {"equals", "not_equals"},
+		"resource.accessKeyDetails.userName":                                             {"equals", "not_equals"},
+		"resource.accessKeyDetails.userType":                                             {"equals", "not_equals"},
 		"resource.instanceDetails.iamInstanceProfile.id":                                 {"equals", "not_equals"},
 		"resource.instanceDetails.imageId":                                               {"equals", "not_equals"},
 		"resource.instanceDetails.instanceId":                                            {"equals", "not_equals"},
