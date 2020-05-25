@@ -11,6 +11,12 @@ default: build
 build: fmtcheck
 	go install
 
+build-darwin:
+	GOOS=darwin GOARCH=amd64 go build
+
+build-linux:
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
+
 gen:
 	rm -f aws/internal/keyvaluetags/*_gen.go
 	rm -f aws/internal/service/**/lister/*_gen.go
@@ -150,4 +156,4 @@ website-lint-fix:
 	@docker run -v $(PWD):/markdown 06kellyjac/markdownlint-cli --fix website/docs/
 	@terrafmt fmt ./website --pattern '*.markdown'
 
-.PHONY: awsproviderlint build gen golangci-lint sweep test testacc fmt fmtcheck lint tools test-compile website-link-check website-lint website-lint-fix depscheck docscheck
+.PHONY: awsproviderlint build build-darwin build-linux gen golangci-lint sweep test testacc fmt fmtcheck lint tools test-compile website-link-check website-lint website-lint-fix depscheck docscheck
