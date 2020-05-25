@@ -11,6 +11,12 @@ default: build
 build: fmtcheck
 	go install
 
+build-darwin:
+	GOOS=darwin GOARCH=amd64 go build
+
+build-linux:
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
+
 gen:
 	rm -f aws/internal/keyvaluetags/*_gen.go
 	go generate ./...
@@ -181,5 +187,4 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: awsproviderlint build gen golangci-lint sweep test testacc fmt fmtcheck lint tools test-compile website website-link-check website-lint website-lint-fix website-test depscheck docscheck
-
+.PHONY: awsproviderlint build build-darwin build-linux gen golangci-lint sweep test testacc fmt fmtcheck lint tools test-compile website website-link-check website-lint website-lint-fix website-test depscheck docscheck
