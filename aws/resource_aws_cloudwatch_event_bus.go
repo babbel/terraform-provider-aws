@@ -95,11 +95,17 @@ func resourceAwsCloudWatchEventBusRead(d *schema.ResourceData, meta interface{})
 	d.Set("arn", output.Arn)
 	d.Set("name", output.Name)
 
-	json, err := structure.NormalizeJsonString(*output.Policy)
+	var policy interface{}
+	if output.Policy == nil {
+		policy = ""
+	} else {
+		policy = output.Policy
+	}
+	json, err := structure.NormalizeJsonString(policy)
 	if err != nil {
 		return fmt.Errorf("policy contains an invalid JSON: %s", err)
 	}
-	d.Set("policy", json)
+	d.Set("policy", &json)
 
 	return nil
 }
