@@ -262,9 +262,14 @@ jobs:
   # See https://github.com/actions/upload-release-asset
   babbel_release:
     name: Release Babbel fork
-    needs: [go_test, golangci-lint] 
+    needs: [go_test, golangci-lint]
     if: startsWith( github.event.ref, 'refs/tags/v' )
     runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+          goos: [darwin, linux]
+
     steps:
 
     - name: set up Go 1.14
@@ -282,24 +287,7 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-    - name: parse version string
-      id: parse_version
-      run: |
-        export BUILD_VERSION=$(echo $GITHUB_REF | sed -e 's/refs.tags.\(.*\)$/\1/')
-        export BUILD_NAME=terraform-provider-aws_$BUILD_VERSION
-        echo "::set-output name=BUILD_NAME::$BUILD_NAME"
-        echo ::set-output name=ZIP_NAME_LINUX::"$BUILD_NAME"_linux_amd64.zip
-        echo ::set-output name=ZIP_NAME_DARWIN::"$BUILD_NAME"_darwin_amd64.zip
-    - name: build Linux
-      run: |
-        make build-linux
-        mv terraform-provider-aws ${{ steps.parse_version.outputs.BUILD_NAME }}
-        zip --junk-paths ${{ steps.parse_version.outputs.ZIP_NAME_LINUX }} ${{ steps.parse_version.outputs.BUILD_NAME }}
-    - name: build Darwin
-      run: |
-        make build-darwin
-        mv terraform-provider-aws ${{ steps.parse_version.outputs.BUILD_NAME }}
-        zip --junk-paths ${{ steps.parse_version.outputs.ZIP_NAME_DARWIN }} ${{ steps.parse_version.outputs.BUILD_NAME }}
+
     - name: create release
       id: create_release
       uses: actions/create-release@v1
@@ -311,24 +299,26 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: upload Release Asset Linux
+    - name: parse version string
+      id: parse_version
+      run: |
+        export BUILD_VERSION=$(echo $GITHUB_REF | sed -e 's/refs.tags.\(.*\)$/\1/')
+        export BUILD_NAME=terraform-provider-aws_$BUILD_VERSION
+        echo "::set-output name=BUILD_NAME::$BUILD_NAME"
+        echo ::set-output name=ZIP_NAME::"$BUILD_NAME"_${{ matrix.goos }}_amd64.zip
+
+    - name: build and zip
+      run: |
+        make build-${{ matrix.goos}}
+        mv terraform-provider-aws ${{ steps.parse_version.outputs.BUILD_NAME }}
+        zip --junk-paths ${{ steps.parse_version.outputs.ZIP_NAME }} ${{ steps.parse_version.outputs.BUILD_NAME }}
+
+    - name: upload release asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ steps.parse_version.outputs.ZIP_NAME_LINUX }}
-        asset_name: ${{ steps.parse_version.outputs.ZIP_NAME_LINUX }}
-
-        asset_content_type: application/zip
-
-    - name: Upload Release Asset Darwin
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ steps.parse_version.outputs.ZIP_NAME_DARWIN }}
-        asset_name: ${{ steps.parse_version.outputs.ZIP_NAME_DARWIN }}
-
+        asset_path: ./${{ steps.parse_version.outputs.ZIP_NAME }}
+        asset_name: ${{ steps.parse_version.outputs.ZIP_NAME }}
         asset_content_type: application/zip
