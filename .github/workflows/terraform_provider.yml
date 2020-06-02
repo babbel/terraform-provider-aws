@@ -328,9 +328,10 @@ jobs:
 
     - name: build and zip
       run: |
-        make build-${{ matrix.goos}}
-        mv terraform-provider-aws ${{ steps.parse_version.outputs.BUILD_NAME }}
-        zip --junk-paths ${{ steps.parse_version.outputs.ZIP_NAME }} ${{ steps.parse_version.outputs.BUILD_NAME }}
+        # make build-${{ matrix.goos}}
+        # mv terraform-provider-aws ${{ steps.parse_version.outputs.BUILD_NAME }}
+        # zip --junk-paths ${{ steps.parse_version.outputs.ZIP_NAME }} ${{ steps.parse_version.outputs.BUILD_NAME }}
+        touch ${{ steps.parse_version.outputs.ZIP_NAME }}
 
     - name: download release url file
       uses: actions/download-artifact@v1
@@ -341,6 +342,9 @@ jobs:
       run: |
         export RELEASE_URL=$(cat release/url.txt)
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
+
+    - name: echo url
+      run: echo ${{ steps.release_url.outputs.RELEASE_URL }}
 
     - name: upload release asset
       uses: actions/upload-release-asset@v1
