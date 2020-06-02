@@ -344,12 +344,14 @@ jobs:
         cat release/url.txt
         export RELEASE_URL=$(cat release/url.txt)
         echo $RELEASE_URL
-        export FOO=bar
+        export FOO=foo
+        echo "::set-output name=BAR::bar"
         echo "::set-output name=FOO::$FOO"
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
 
     - name: echo url
       run: |
+        echo $BAR
         echo $FOO
         echo $RELEASE_URL
 
