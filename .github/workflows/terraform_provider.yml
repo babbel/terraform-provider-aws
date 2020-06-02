@@ -280,7 +280,7 @@ jobs:
         prerelease: false
 
     - name: create release url file
-      run: cat ${{ steps.create_release.outputs.upload_url }} > url.txt
+      run: echo '${{ steps.create_release.outputs.upload_url }}' > url.txt
 
     # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
     - name: Upload release url
