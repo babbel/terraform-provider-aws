@@ -343,9 +343,13 @@ jobs:
         ls release
         cat release/url.txt
         export RELEASE_URL=$(cat release/url.txt)
+        echo $RELEASE_URL
+        export FOO=bar
+        echo "::set-output name=FOO::$FOO"
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
 
     - name: echo url
+      run: echo ${{ steps.release_url.outputs.FOO }}
       run: echo ${{ steps.release_url.outputs.RELEASE_URL }}
 
     - name: upload release asset
