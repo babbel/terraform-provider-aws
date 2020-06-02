@@ -340,6 +340,8 @@ jobs:
 
     - name: release_url
       run: |
+        ls release
+        cat release/url.txt
         export RELEASE_URL=$(cat release/url.txt)
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
 
