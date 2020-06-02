@@ -349,8 +349,9 @@ jobs:
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
 
     - name: echo url
-      run: echo ${{ steps.release_url.outputs.FOO }}
-      run: echo ${{ steps.release_url.outputs.RELEASE_URL }}
+      run: |
+        echo ${{ steps.release_url.outputs.FOO }}
+        echo ${{ steps.release_url.outputs.RELEASE_URL }}
 
     - name: upload release asset
       uses: actions/upload-release-asset@v1
