@@ -350,8 +350,8 @@ jobs:
 
     - name: echo url
       run: |
-        echo ${{ steps.release_url.outputs.FOO }}
-        echo ${{ steps.release_url.outputs.RELEASE_URL }}
+        echo $FOO
+        echo $RELEASE_URL
 
     - name: upload release asset
       uses: actions/upload-release-asset@v1
