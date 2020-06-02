@@ -339,6 +339,7 @@ jobs:
         name: release
 
     - name: release_url
+      id: release_url
       run: |
         ls release
         cat release/url.txt
@@ -346,14 +347,13 @@ jobs:
         echo $RELEASE_URL
         export FOO=foo
         echo "::set-output name=BAR::bar"
-        echo "::set-output name=FOO::$FOO"
         echo "::set-output name=RELEASE_URL::$RELEASE_URL"
 
     - name: echo url
       run: |
+        echo lala
         echo $BAR
-        echo $FOO
-        echo $RELEASE_URL
+        echo ${{ steps.release_url.outputs.release_url }}
 
     - name: upload release asset
       uses: actions/upload-release-asset@v1
