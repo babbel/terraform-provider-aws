@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - 'release/**'
+      - pre-release
     tags:
     - 'v*'
   pull_request:
