@@ -2509,7 +2509,7 @@ func validateCloudWatchEventBusName(v interface{}, k string) (ws []string, error
 			k, pattern, value))
 	}
 
-	return
+	return ws, errors
 }
 
 func validateCloudWatchEventEventBusNameReference(v interface{}, k string) (ws []string, errors []error) {
