@@ -372,7 +372,7 @@ jobs:
         touch ${{ steps.parse_version.outputs.ZIP_NAME }}
 
     - name: download release url file
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v2.0.6
       with:
         name: release
 
